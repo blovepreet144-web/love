@@ -12,9 +12,10 @@ if exist "Install" del /f /q "Install" >nul 2>nul
 
 :check_git
 set "GIT_CMD="
-where git >nul 2>nul
-if %errorlevel% equ 0 (
-    set "GIT_CMD=git"
+if exist "%~dp0git-portable\cmd\git.exe" (
+    set "GIT_CMD=%~dp0git-portable\cmd\git.exe"
+) else if exist "%~dp0git-portable\bin\git.exe" (
+    set "GIT_CMD=%~dp0git-portable\bin\git.exe"
 ) else if exist "C:\Program Files\Git\cmd\git.exe" (
     set "GIT_CMD=C:\Program Files\Git\cmd\git.exe"
 ) else if exist "C:\Program Files\Git\bin\git.exe" (
@@ -23,10 +24,9 @@ if %errorlevel% equ 0 (
     set "GIT_CMD=%LOCALAPPDATA%\Programs\Git\cmd\git.exe"
 ) else if exist "%LOCALAPPDATA%\Programs\Git\bin\git.exe" (
     set "GIT_CMD=%LOCALAPPDATA%\Programs\Git\bin\git.exe"
-) else if exist "%ProgramFiles(x86)%\Git\cmd\git.exe" (
-    set "GIT_CMD=%ProgramFiles(x86)%\Git\cmd\git.exe"
-) else if exist "%ProgramFiles(x86)%\Git\bin\git.exe" (
-    set "GIT_CMD=%ProgramFiles(x86)%\Git\bin\git.exe"
+) else (
+    where git >nul 2>nul
+    if %errorlevel% equ 0 set "GIT_CMD=git"
 )
 
 if "!GIT_CMD!"=="" (
@@ -50,17 +50,17 @@ if "!GIT_CMD!"=="" (
 echo [OK] Using Git: "!GIT_CMD!"
 echo.
 
-:: 1. Configure Git identity
-"!GIT_CMD!" config --global user.name "Lovepreet Singh Bhangu"
-"!GIT_CMD!" config --global user.email "blovepreet144@gmail.com"
-
-:: 2. Initialize Git repository if needed
+:: 1. Initialize Git repository if needed
 if not exist ".git" (
     echo [*] Initializing Git repository...
     "!GIT_CMD!" init -b main
 ) else (
     echo [OK] Git repository already initialized.
 )
+
+:: 2. Configure Git identity
+"!GIT_CMD!" config user.name "Lovepreet Singh Bhangu"
+"!GIT_CMD!" config user.email "blovepreet144@gmail.com"
 
 :: 3. Set GitHub remote
 echo [*] Setting GitHub remote URL...
